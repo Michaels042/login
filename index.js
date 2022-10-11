@@ -4,6 +4,9 @@ const app = express();
 const bcrypt = require("bcryptjs");
 const salt = bcrypt.genSaltSync();
 
+const jwt = require("jsonwebtoken");
+const secretKey = "Obi2023@Malay";
+
 // console.log(salt);
 // const password = "viral password";
 // const hash = bcrypt.hashSync(password, salt);
@@ -85,16 +88,19 @@ let userLogin = (req, res) => {
         .json({ status: "unsuccessful", message: "Incorrect Email/Password" });
     } else {
       if (bcrypt.compareSync(password, userExist[0].password)) {
-        res
-          .status(200)
-          .json({ status: "success", message: "User loggedin successfully" });
+        const token = jwt.sign({ email }, secretKey, {
+          expiresIn: "70000ms",
+        });
+        res.status(200).json({
+          status: "success",
+          message: "User loggedin successfully",
+          token,
+        });
       } else {
-        res
-          .status(404)
-          .json({
-            status: "unsuccessful",
-            message: "Incorrect Email/Password",
-          });
+        res.status(404).json({
+          status: "unsuccessful",
+          message: "Incorrect Email/Password",
+        });
       }
     }
   }
